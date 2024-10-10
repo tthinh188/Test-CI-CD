@@ -20,5 +20,5 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: List env variables:
+      - name: List env variables
       run: env
