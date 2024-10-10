@@ -21,4 +21,4 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: List env variables
-      run: env
+        run: env
