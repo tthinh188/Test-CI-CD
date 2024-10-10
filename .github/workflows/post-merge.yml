@@ -21,6 +21,5 @@ jobs:
               exit 1
           fi
           echo "PR_NUMBER=$PR_NUMBER" >> $GITHUB_ENV
-
       - name: print env
         run: env
