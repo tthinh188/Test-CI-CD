@@ -1,48 +1,38 @@
 name: Update Commit Message
 
 on:
-  push:
-    branches:
-      - main
+  pull_request:
+    types: [closed]
 
 permissions:
   contents: write
 
 jobs:
   update_commit_message:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0  # Fetch the entire history to enable rebase
 
       - name: Set Git configuration
         run: |
           git config --global user.email "phan.tthinh1@gmail.com"
           git config --global user.name "Thinh Phan"
 
-      - name: Update commit message
+      - name: Rebase the merged commit onto the main branch
+        run: |
+          git checkout main
+          git pull origin main
+          git rebase origin/main
+
+      - name: Amend the commit message to include PR number
         run: |
           PR_NUMBER=${{ github.event.pull_request.number }}
-          NEW_MESSAGE="(#${PR_NUMBER})"
+          NEW_MESSAGE="$(git log -1 --pretty=%B) (#${PR_NUMBER})"
 
           # Update the commit message using git commit --amend
           git commit --amend -m "$NEW_MESSAGE"
-          git push origin HEAD --force
-
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Extract PR number from the last merge commit
-        id: extract_pr_number
-        run: |
-          COMMIT_MESSAGE=$(git log -1 --pretty=%B)
-          echo "Commit message: $COMMIT_MESSAGE"
-          PR_NUMBER=$(echo "$COMMIT_MESSAGE" | grep -oP '(?<=\(#)\d+(?=\))' | tr -d '[:space:]')
-          if [ -z "$PR_NUMBER" ]; then
-              echo "PR number not found in the commit message."
-              exit 1
-          fi
-          echo "Sanitized PR number: $PR_NUMBER"
-          echo "PR_NUMBER=$PR_NUMBER" >> $GITHUB_ENV
+          git push origin main --force
