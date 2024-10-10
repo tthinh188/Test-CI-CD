@@ -1,4 +1,4 @@
-Name: Post Merge
+name: Post Merge
 
 on:
   push:
@@ -6,10 +6,9 @@ on:
       - main
 
 jobs:
-  Get PR number:
+  get_pr_number:
     runs-on: ubuntu-latest
     steps:
-
       - name: Checkout repository
         uses: actions/checkout@v2
 
