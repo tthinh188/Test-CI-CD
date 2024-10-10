@@ -15,10 +15,9 @@ jobs:
         run: |
           COMMIT_MESSAGE=$(git log -1 --pretty=%B)
           echo "Commit message: $COMMIT_MESSAGE"
-          PR_NUMBER=$(echo "$COMMIT_MESSAGE" | grep -oP '(?<=\(#)\d+(?=\))' | tr -d '[:space:]')
+          PR_NUMBER=$(echo "$COMMIT_MESSAGE" | grep -oP '(?<=\(#)\d+(?=\))')
           if [ -z "$PR_NUMBER" ]; then
               echo "PR number not found in the commit message."
               exit 1
           fi
-          echo "Sanitized PR number: $PR_NUMBER"
           echo "PR_NUMBER=$PR_NUMBER" >> $GITHUB_ENV
