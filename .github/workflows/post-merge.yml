@@ -3,7 +3,7 @@ Name: Post Merge
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   Get PR number:
