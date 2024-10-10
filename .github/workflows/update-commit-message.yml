@@ -12,12 +12,36 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Set Git configuration
+        run: |
+          git config --global user.email "phan.tthinh1.com"
+          git config --global user.name "Thinh Phan"
+
       - name: Update commit message
         run: |
           PR_NUMBER=${{ github.event.pull_request.number }}
-          COMMIT_SHA=$(git rev-parse HEAD)
           NEW_MESSAGE="(#${PR_NUMBER})"
 
           # Update the commit message using git commit --amend
           git commit --amend -m "$NEW_MESSAGE"
           git push origin HEAD --force
+
+
+  get_pr_number:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Extract PR number from the last merge commit
+        id: extract_pr_number
+        run: |
+          COMMIT_MESSAGE=$(git log -1 --pretty=%B)
+          echo "Commit message: $COMMIT_MESSAGE"
+          PR_NUMBER=$(echo "$COMMIT_MESSAGE" | grep -oP '(?<=\(#)\d+(?=\))' | tr -d '[:space:]')
+          if [ -z "$PR_NUMBER" ]; then
+              echo "PR number not found in the commit message."
+              exit 1
+          fi
+          echo "Sanitized PR number: $PR_NUMBER"
+          echo "PR_NUMBER=$PR_NUMBER" >> $GITHUB_ENV
