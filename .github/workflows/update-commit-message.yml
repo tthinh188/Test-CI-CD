@@ -1,4 +1,4 @@
-name: Update Commit Message
+name: Update Merge Commit Message
 
 on:
   pull_request:
@@ -8,31 +8,25 @@ permissions:
   contents: write
 
 jobs:
-  update_commit_message:
+  update_merge_commit_message:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
-          fetch-depth: 0  # Fetch the entire history to enable rebase
+          fetch-depth: 2  # Fetch sufficient history to allow commit modification
 
       - name: Set Git configuration
         run: |
           git config --global user.email "phan.tthinh1@gmail.com"
           git config --global user.name "Thinh Phan"
 
-      - name: Rebase the merged commit onto the main branch
-        run: |
-          git checkout main
-          git pull origin main
-          git rebase origin/main
-
-      - name: Amend the commit message to include PR number
+      - name: Update the merge commit message to include PR number
         run: |
           PR_NUMBER=${{ github.event.pull_request.number }}
-          NEW_MESSAGE="$(git log -1 --pretty=%B) (#${PR_NUMBER})"
+          NEW_MESSAGE="(#${PR_NUMBER})"
 
-          # Update the commit message using git commit --amend
+          # Update the merge commit message using git commit --amend
           git commit --amend -m "$NEW_MESSAGE"
-          git push origin main --force
+          git push origin HEAD --force
