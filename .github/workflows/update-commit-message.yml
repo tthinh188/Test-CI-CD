@@ -1,8 +1,12 @@
 name: Update Commit Message
 
 on:
-  pull_request:
-    types: [closed]
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
 
 jobs:
   update_commit_message:
@@ -11,11 +15,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set Git configuration
         run: |
-          git config --global user.email "phan.tthinh1.com"
-          git config --global user.name "Thinh Phan"
+          git config --global user.email "you@example.com"
+          git config --global user.name "Your Name"
 
       - name: Update commit message
         run: |
@@ -26,10 +32,6 @@ jobs:
           git commit --amend -m "$NEW_MESSAGE"
           git push origin HEAD --force
 
-
-  get_pr_number:
-    runs-on: ubuntu-latest
-    steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
