@@ -1,0 +1,23 @@
+name: Update Commit Message
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  update_commit_message:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Update commit message
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          COMMIT_SHA=$(git rev-parse HEAD)
+          NEW_MESSAGE="(#${PR_NUMBER})"
+
+          # Update the commit message using git commit --amend
+          git commit --amend -m "$NEW_MESSAGE"
+          git push origin HEAD --force
